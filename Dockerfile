@@ -31,11 +31,15 @@ WORKDIR /usr/src/app
 # Set production environment
 ENV NODE_ENV=production
 
-# Copy built app and necessary runtime files
+# Copy build artifacts and runtime files
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/package*.json ./
 COPY --from=builder /usr/src/app/prisma ./prisma
+COPY scripts/entrypoint.sh ./scripts/entrypoint.sh
+
+# Ensure entrypoint is executable
+RUN chmod +x ./scripts/entrypoint.sh
 
 # Create logs directory for winston
 RUN mkdir -p logs
@@ -43,5 +47,8 @@ RUN mkdir -p logs
 # Expose the application port
 EXPOSE 5000
 
-# Start the application
+# Set entrypoint to run migrations before start
+ENTRYPOINT ["./scripts/entrypoint.sh"]
+
+# Start command
 CMD ["node", "dist/server.js"]

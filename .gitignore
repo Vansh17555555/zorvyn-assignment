@@ -25,7 +25,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # Prisma
-/prisma/migrations/
 /prisma/generated/
 
 # OS Specific

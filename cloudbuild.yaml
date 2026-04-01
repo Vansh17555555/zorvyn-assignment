@@ -1,0 +1,30 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/finance-dashboard', '.']
+
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/finance-dashboard']
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'finance-dashboard'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/finance-dashboard'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      # Example of setting env vars directly
+      # Note: Secrets should ideally be handled via Secret Manager
+      - '--set-env-vars'
+      - 'NODE_ENV=production,PORT=5000'
+
+images:
+  - 'gcr.io/$PROJECT_ID/finance-dashboard'
