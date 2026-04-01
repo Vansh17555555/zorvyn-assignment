@@ -12,6 +12,18 @@ const router = Router();
  *     summary: Get dashboard statistics (income, expenses, trends, recent)
  *     tags: [Dashboard]
  *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: query
+ *         name: months
+ *         schema:
+ *           type: integer
+ *           default: 12
+ *         description: Number of months to calculate trends for
+ *     responses:
+ *       200:
+ *         description: Dashboard data retrieved successfully
+ *       401:
+ *         description: Unauthorized
  */
 router.get('/', authenticate, dashboardRateLimiter, DashboardController.getDashboard);
 

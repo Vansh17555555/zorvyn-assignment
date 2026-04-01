@@ -11,6 +11,9 @@ import logger from './utils/logger';
 
 const app = express();
 
+// Trust Cloud Run's proxy (required for rate-limiting)
+app.set('trust proxy', 1);
+
 // Standard Middlewares
 app.use(securityMiddleware); // Helmet
 app.use(cors());

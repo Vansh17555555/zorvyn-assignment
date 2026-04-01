@@ -15,7 +15,8 @@ RUN npm install
 COPY . .
 
 # Generate Prisma Client
-RUN npx prisma generate
+# Note: DATABASE_URL is required by Prisma even at build time for schema validation
+RUN DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder" npx prisma generate
 
 # Build TypeScript to Javascript
 RUN npm run build
@@ -36,19 +37,13 @@ COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/package*.json ./
 COPY --from=builder /usr/src/app/prisma ./prisma
-COPY scripts/entrypoint.sh ./scripts/entrypoint.sh
-
-# Ensure entrypoint is executable
-RUN chmod +x ./scripts/entrypoint.sh
+COPY prisma.config.ts ./prisma.config.ts
 
 # Create logs directory for winston
 RUN mkdir -p logs
 
-# Expose the application port
-EXPOSE 5000
-
-# Set entrypoint to run migrations before start
-ENTRYPOINT ["./scripts/entrypoint.sh"]
+# Expose the application port (Cloud Run defaults to 8080)
+EXPOSE 8080
 
 # Start command
 CMD ["node", "dist/server.js"]
